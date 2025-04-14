@@ -1,0 +1,10 @@
+# This file is to resolve the llama.cpp and other dependencies needed to build the project
+git clone https://github.com/ggml-org/llama.cpp
+cd llama.cpp
+cmake llama.cpp
+make
+mkdir sarah
+mv bin/* sarah
+# cd ..
+rm -rf llama.cpp
+mkdir sarah/models
