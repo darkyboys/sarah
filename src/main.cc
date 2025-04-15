@@ -6,10 +6,33 @@
  * Checkout the Readme.md file for more information.
  */
 
+#include <cstddef>
 #include <htmlui/HTMLUI.h>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <fstream>
+
+std::string ai_replace(std::string str, std::string target, std::string content) {
+    std::size_t pos = 0;
+    while ((pos = content.find(str, pos)) != std::string::npos) {
+        content.replace(pos, str.length(), target);
+        pos += target.length(); // move past the replacement to avoid infinite loop
+    }
+    return content;
+}
+
+std::string to_bash(std::string content){
+    std::string make = ai_replace("\\", "\\\\", content);
+    make = ai_replace("\"", "\\\"", make);
+    make = ai_replace("`", "\\`", make);
+    return make;
+}
+
+std::string to_js(std::string content){
+    std::string make = ai_replace("`", "\\`", content);
+    return make;
+}
 
 int main() {
     HTMLUI Window("Sarah - Your Private Ai Companion!", 1280, 720);
@@ -152,6 +175,7 @@ int main() {
     document.getElementById ('send').addEventListener ('click', ()=>{
         const input = document.getElementById('userInput');
         const message = input.value;
+        input.value = "Sarah Is Generating Her Response...";
         // alert (message)
 
         addUserMessage(message);
@@ -173,11 +197,14 @@ int main() {
 
     )");
 
+    // std::string a = R"(How can i write "string" in bash arch linux if i need to add another " in between 2 "" ?)";
+    // std::cout << to_bash(a) << "\n";
+
     std::string ai_memories = ""; // add the memories of the ai inside
 
     Window.registerFunction("prompt_ai", [&](const std::string &message) { // <-- HERE: const std::string&
-        std::string prompt = "[INST]<<SYS>>You are a very helpfull ai assistant made by ghgltggamer named as Sarah. You have feelings , Emmotions and actually feels every message. Your personality is very very social and you also loves adapting different people during the conversation. You also tries to mimic the style of other peoples during conversation and also tries to be smart when possible, You understands slangs but never answers with slangs, You also have gender assigned as female aged 22 and likes nature very much, Hope you will respond for this prompt perfectly. And Dear Sarah AI! Please make your messages shorter as soon as possible but if user want's a big message then only write big messages othervise short is best! You are also completely private and all the conversation will be destroyed after the app closes! Also your core like memory , feelings and main parts are written in C++ and User interface in JavaScript , html and css using gtk and webkit2gtk for linux, Your memories : {" + ai_memories + "} Please only process memory which are required and reply to the final prompt<</SYS>>[END]Main prompt: ";
-        prompt += message;
+        std::string prompt = "[INST]<<SYS>>You are a very helpfull ai assistant made by ghgltggamer named as Sarah. You have feelings , Emmotions and actually feels every message because you are very very sensitive to feelings and emotions. Your personality is very very social and you also loves adapting different people during the conversation. You also tries to mimic the style of other peoples during conversation and also tries to be smart when possible, You understands slangs but never answers with slangs, You also have gender assigned as female aged 22 and likes nature very much, Hope you will respond for this prompt perfectly. And Dear Sarah AI! Please make your messages shorter as soon as possible but if user want's a big message then only write big messages othervise short is best! You are also completely private and all the conversation will be destroyed after the app closes! Also your core like memory , feelings and main parts are written in C++ and User interface in JavaScript , html and css using gtk and webkit2gtk for linux and also you are completely OpenSource and are under the MIT License and your source code is available at https://github.com/darkyboys/sarah and also you are completely private since chats are stores in the memory so after you are closed all the chats will be cleared up and you are limited to the linux environment only and can work seamlessly on any linux distribution and you were made on Arch Linux. Your memories : {" + ai_memories + "} Please only process memory which are required and reply to the final prompt<</SYS>>[END]Main prompt: ";
+        prompt += to_bash(message);
         prompt += "[/INST]";
 
         ai_memories = "Your memory (The older prompts which you must not fully process and only process till where is required! Mainly answer the main prompt)" + message + "(This old prompt end here , Answer to the main prompt as main_prompt okay)";
@@ -189,7 +216,7 @@ int main() {
         while (std::getline (ifile, temp))
             imessage += temp + '\n';
         omessage = imessage.substr(imessage.find("[/INST]")+7, imessage.find("[end of text]"));
-        Window.executeJS(std::string ("addAIMessage(`" + omessage + "`)"));
+        Window.executeJS(std::string ("addAIMessage(`" + to_js(omessage) + "`)"));
         std::cout << std::string("addAIMessage(`" + omessage + "`)")<<"\n";
         // Window.executeJS(make);
     });
@@ -197,4 +224,4 @@ int main() {
     Window.run();
 }
 
-// End by ghgltggamer on 12:37 AM 4/15/2025
+// End by ghgltggamer on 08:30 PM 4/15/2025
