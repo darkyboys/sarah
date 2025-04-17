@@ -38,158 +38,240 @@ int main() {
     HTMLUI Window("Sarah - Your Private Ai Companion!", 1280, 720);
     
     Window.loadHTML(R"(
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AI Assistant</title>
-    <style>
-        body {
-            background: #f5f7fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <title>Sarah AI Assistant</title>
+  <style>
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.2);
+      --blur: blur(15px);
+      --pastel-purple: #e0bbff;
+      --pastel-pink: #ffd6e8;
+      --pastel-yellow: #fff4b8;
+      --pastel-blue: #d6f0ff;
+      --ai-color: #fbeeff;
+      --user-color: #c7f2ff;
+      --font: 'Segoe UI', sans-serif;
+    }
 
-        .chat-container {
-            background: white;
-            width: 400px;
-            height: 600px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: var(--font);
+      background: linear-gradient(135deg, #ffe9f3, #e3f6ff, #fff9e8);
+      background-size: 400% 400%;
+      animation: backgroundFlow 15s ease infinite;
+    }
 
-        .chat-header {
-            background: #4a90e2;
-            padding: 20px;
-            color: white;
-            font-size: 1.2em;
-            text-align: center;
-        }
+    .chat-container {
+      width: 650px;
+      height: 700px;
+      border-radius: 30px;
+      backdrop-filter: var(--blur);
+      background: var(--glass-bg);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      animation: popIn 0.6s ease;
+    }
 
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    .chat-header {
+      background: linear-gradient(to right, #f9caff, #ffd1dc);
+      color: #4b0082;
+      padding: 30px;
+      text-align: center;
+      font-size: 1.8em;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-        .message {
-            max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 20px;
-            line-height: 1.4;
-        }
+    .chat-messages {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      animation: fadeIn 1s ease;
+    }
 
-        .user {
-            align-self: flex-end;
-            background: #4a90e2;
-            color: white;
-        }
+    .message {
+      max-width: 85%;
+      padding: 18px 25px;
+      border-radius: 20px;
+      font-size: 1.2em;
+      line-height: 1.6;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
 
-        .ai {
-            align-self: flex-start;
-            background: #e4e6eb;
-            color: black;
-        }
+    .user {
+      align-self: flex-end;
+      background: var(--user-color);
+      color: #1b2a49;
+    }
 
-        .chat-input {
-            display: flex;
-            border-top: 1px solid #ddd;
-        }
+    .ai {
+      align-self: flex-start;
+      background: var(--ai-color);
+      color: #4b0082;
+    }
 
-        .chat-input input {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            outline: none;
-            font-size: 1em;
-        }
+    .chat-input {
+      display: flex;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
 
-        .chat-input button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 0 20px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s;
-        }
+    .chat-input input {
+      flex: 1;
+      padding: 18px;
+      border: none;
+      outline: none;
+      border-radius: 15px;
+      font-size: 1.2em;
+      background: rgba(255, 255, 255, 0.3);
+      color: #4b0082;
+      transition: box-shadow 0.3s ease;
+    }
 
-        .chat-input button:hover {
-            background: #357ABD;
-        }
-    </style>
+    .chat-input input:focus {
+      box-shadow: 0 0 0 2px #f9caff;
+    }
+
+    .chat-input button {
+      background: linear-gradient(to right, #f9caff, #ffd1dc);
+      color: #4b0082;
+      border: none;
+      border-radius: 15px;
+      margin-left: 15px;
+      padding: 0 25px;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .chat-input button:hover {
+      background: linear-gradient(to right, #fbb1ff, #ffc8d8);
+      transform: scale(1.05);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes backgroundFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Scrollbar styling for ✨aesthetic✨ */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #f9caff;
+      border-radius: 8px;
+    }
+
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+      .chat-container {
+        width: 90%;
+        height: 600px;
+      }
+      .chat-header {
+        font-size: 1.4em;
+        padding: 20px;
+      }
+      .chat-messages {
+        padding: 15px;
+      }
+      .message {
+        max-width: 90%;
+        padding: 12px 18px;
+        font-size: 1em;
+      }
+      .chat-input input {
+        font-size: 1em;
+      }
+      .chat-input button {
+        padding: 0 20px;
+        font-size: 1em;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <div class="chat-container">
-    <div class="chat-header">
-        Sarah AI Assistant
-    </div>
-    <div class="chat-messages" id="chatMessages">
-        <div class="message ai">Hello! How can I help you today?</div>
-    </div>
-    <div class="chat-input">
-        <input type="text" id="userInput" placeholder="Type a message..." />
-        <button id="send">Send</button>
-    </div>
+  <div class="chat-header">
+    Sarah AI Assistant 🌸
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="message ai">Hello! How can I help you today? 🌼</div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="userInput" placeholder="Type a message..." />
+    <button id="send">Send</button>
+  </div>
 </div>
 
 <script>
-    function addUserMessage(text) {
-        const chatMessages = document.getElementById('chatMessages');
-        const userMsg = document.createElement('div');
-        userMsg.className = 'message user';
-        userMsg.innerText = text;
-        chatMessages.appendChild(userMsg);
-        scrollToBottom();
-    }
+  function addUserMessage(text) {
+    const chatMessages = document.getElementById('chatMessages');
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.innerText = text;
+    chatMessages.appendChild(userMsg);
+    scrollToBottom();
+  }
 
-    function addAIMessage(text) {
-        const chatMessages = document.getElementById('chatMessages');
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'message ai';
-        aiMsg.innerText = text;
-        chatMessages.appendChild(aiMsg);
-        scrollToBottom();
-    }
+  function addAIMessage(text) {
+    const chatMessages = document.getElementById('chatMessages');
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'message ai';
+    aiMsg.innerText = text;
+    chatMessages.appendChild(aiMsg);
+    scrollToBottom();
+  }
 
-    function handleSend() {
-        const input = document.getElementById('userInput');
-        const message = input.value;
-        alert (message)
+  document.getElementById('send').addEventListener('click', () => {
+    const input = document.getElementById('userInput');
+    const message = input.value;
+    input.value = "Sarah Is Generating Her Response...";
+    addUserMessage(message);
+    setTimeout(() => {
+      window.nativeBridge.invoke('prompt_ai', message);
+      input.value = '';
+    }, 1000);
+  });
 
-        addUserMessage(message);
-
-        input.value = '';
-    }
-    document.getElementById ('send').addEventListener ('click', ()=>{
-        const input = document.getElementById('userInput');
-        const message = input.value;
-        input.value = "Sarah Is Generating Her Response...";
-        // alert (message)
-
-        addUserMessage(message);
-        setTimeout (()=>{
-            window.nativeBridge.invoke ('prompt_ai', message);
-            input.value = '';
-        }, 1000)
-    })
-
-
-    function scrollToBottom() {
-        const chatMessages = document.getElementById('chatMessages');
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+  function scrollToBottom() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 </script>
 
 </body>
