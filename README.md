@@ -53,6 +53,39 @@ This will not just make but also run the application once, But don't enter any p
 
 Currently the project is built inside the new `sarah` directory which will be containing llama.cpp binaries and libraries but also `Sarah` binary of the project which is the entire UI.
 
+#### Here are the full installation commands only for the isolated environments since these contains all the installations with dependencies for arch linux only means with these there are no chances of errors but will also take longer
+```bash
+# Update the system
+sudo pacman -Syu
+
+# Install git, gcc, cmake and make
+sudo pacman -S git gcc cmake make
+
+# Install Libraries
+sudo pacman -S gtk3 webkit2gtk
+
+# Make the build environment
+mkdir build-config
+cd build-config
+
+# Install magma because it is required to build sarah ai
+git clone https://github.com/darkyboys/magma
+cd magma
+mkdir bin
+g++ src/main.cc -o bin/magma
+sudo mv bin/magma /usr/local/bin
+magma -v
+
+# Install Sarah Ai With all it's dependencies and mode and make it ready to use
+git clone https://github.com/darkyboys/sarah
+cd sarah
+sudo magma resolve
+sudo magma make
+sudo magma get-model
+echo "Sarah Ai was maked and can be found at" `pwd` "/sarah"
+echo ""
+```
+
 ---
 
 #### Get the default model
