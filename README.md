@@ -69,19 +69,25 @@ mkdir build-config
 cd build-config
 
 # Install magma because it is required to build sarah ai
+echo "Installing magma"
+echo ""
 git clone https://github.com/darkyboys/magma
 cd magma
 mkdir bin
 g++ src/main.cc -o bin/magma
 sudo mv bin/magma /usr/local/bin
 magma -v
+cd ..
+rm -rf magma
+echo "magma was installed"
+echo ""
 
 # Install Sarah Ai With all it's dependencies and mode and make it ready to use
 git clone https://github.com/darkyboys/sarah
 cd sarah
 sudo magma resolve
 sudo magma make
-sudo magma get-model
+sudo magma get_model
 echo "Sarah Ai was maked and can be found at" `pwd` "/sarah"
 echo ""
 ```
