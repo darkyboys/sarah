@@ -4,6 +4,6 @@ bin  (`sarah`);
 
 pkg_config (`--cflags --libs gtk+-3.0 webkit2gtk-4.0`);
 compile_arguments (`-Iinclude`);
-exec ();
+# exec ();
 system (`clear`);
 make ();
