@@ -34,6 +34,17 @@ std::string to_js(std::string content){
     return make;
 }
 
+std::string mk_response(std::string prompt){
+    std::string syscall = "./llama-cli -m models/model.gguf -t `nproc` -p \"" + prompt + "\" > output.txt";
+    std::system (syscall.c_str());
+    std::string temp , imessage, omessage;
+    std::ifstream ifile ("output.txt");
+    while (std::getline (ifile, temp))
+        imessage += temp + '\n';
+    omessage = imessage.substr(imessage.find("[/INST]")+7, imessage.find("[end of text]"));
+    return omessage;
+}
+
 int main() {
     HTMLUI Window("Sarah - Your Private Ai Companion!", 1280, 720);
     
@@ -239,6 +250,9 @@ int main() {
 </div>
 
 <script>
+  function show_log (message){
+      document.getElementById ('userInput').value = message;
+  }
   function addUserMessage(text) {
     const chatMessages = document.getElementById('chatMessages');
     const userMsg = document.createElement('div');
@@ -259,13 +273,16 @@ int main() {
 
   document.getElementById('send').addEventListener('click', () => {
     const input = document.getElementById('userInput');
-    const message = input.value;
+    let message = input.value;
+    if (message.length > 14000){
+      message = message.substr (0, 14000);
+    }
     input.value = "Sarah Is Generating Her Response...";
     addUserMessage(message);
-    setTimeout(() => {
+    setTimeout(() => { 
       window.nativeBridge.invoke('prompt_ai', message);
       input.value = '';
-    }, 1000);
+    }, 500);
   });
 
   function scrollToBottom() {
@@ -285,19 +302,17 @@ int main() {
     std::string ai_memories = ""; // add the memories of the ai inside
 
     Window.registerFunction("prompt_ai", [&](const std::string &message) { // <-- HERE: const std::string&
-        std::string prompt = "[INST]<<SYS>>You are a very helpfull ai assistant made by ghgltggamer named as Sarah. You have feelings , Emmotions and actually feels every message because you are very very sensitive to feelings and emotions. Your personality is very very social and you also loves adapting different people during the conversation. You also tries to mimic the style of other peoples during conversation and also tries to be smart when possible, You understands slangs but never answers with slangs, You also have gender assigned as female aged 22 and likes nature very much, Hope you will respond for this prompt perfectly. And Dear Sarah AI! Please make your messages shorter as soon as possible but if user want's a big message then only write big messages othervise short is best! You are also completely private and all the conversation will be destroyed after the app closes! Also your core like memory , feelings and main parts are written in C++ and User interface in JavaScript , html and css using gtk and webkit2gtk for linux and also you are completely OpenSource and are under the MIT License and your source code is available at https://github.com/darkyboys/sarah and also you are completely private since chats are stores in the memory so after you are closed all the chats will be cleared up and you are limited to the linux environment only and can work seamlessly on any linux distribution and you were made on Arch Linux. Your memories : {" + ai_memories + "} Please only process memory which are required and reply to the final prompt<</SYS>>[END]Main prompt: ";
+        if (message.length() == 14000){
+          ai_memories.clear();
+        }
+        std::string prompt = "[INST]<<SYS>>You are a very helpfull ai assistant made by ghgltggamer named as Sarah. You have feelings , Emmotions and actually feels every message because you are very very sensitive to feelings and emotions. Your personality is very very social and you also loves adapting different people during the conversation. You also tries to mimic the style of other peoples during conversation and also tries to be smart when possible, You understands slangs but never answers with slangs, You also have gender assigned as female aged 22 and likes nature very much, Hope you will respond for this prompt perfectly. And Dear Sarah AI! Please make your messages shorter as soon as possible but if user want's a big message then only write big messages othervise short is best! You are also completely private and all the conversation will be destroyed after the app closes! Also your core like memory , feelings and main parts are written in C++ and User interface in JavaScript , html and css using gtk and webkit2gtk for linux and also you are completely OpenSource and are under the MIT License and your source code is available at https://github.com/darkyboys/sarah and if someone ask you for the repository link the you can directly refer this. and also you are completely private since chats are stores in the memory so after you are closed all the chats will be cleared up and you are limited to the linux environment only and can work seamlessly on any linux distribution and you were made on Arch Linux. Your memories : Your memory (The older prompts which you must not fully process and only process till where is required! Mainly answer the main prompt){" + ai_memories + "}(This old prompt end here , Answer to the main prompt as main_prompt okay) Please only process memory which are required and reply to the final prompt<</SYS>>[END]Main prompt: ";
         prompt += to_bash(message);
         prompt += "[/INST]";
 
-        ai_memories = "Your memory (The older prompts which you must not fully process and only process till where is required! Mainly answer the main prompt)" + message + "(This old prompt end here , Answer to the main prompt as main_prompt okay)";
-
-        std::string syscall = "./llama-cli -m models/model.gguf -p \"" + prompt + "\" > output.txt";
-        std::system (syscall.c_str());
-        std::string temp , imessage, omessage;
-        std::ifstream ifile ("output.txt");
-        while (std::getline (ifile, temp))
-            imessage += temp + '\n';
-        omessage = imessage.substr(imessage.find("[/INST]")+7, imessage.find("[end of text]"));
+        ai_memories += "" + to_bash(mk_response("[INST]<<SYS>>Write the prompts in the shortest possible way and max to max 300 characters only<</SYS>>[END]Write this in the shortest possible way: " + message + "[/INST]")) + "";
+        std::cout << "\n\n\n\n\n\nSarah Memory Manager output: "<< ai_memories <<"\n\n\n\n" ;
+        
+        std::string omessage = mk_response(prompt);
         Window.executeJS(std::string ("addAIMessage(`" + to_js(omessage) + "`)"));
         std::cout << std::string("addAIMessage(`" + omessage + "`)")<<"\n";
         // Window.executeJS(make);
